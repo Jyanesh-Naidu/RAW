@@ -4,7 +4,7 @@
 
 // --- 1. SUPABASE SETUP ---
 const SUPABASE_URL = 'https://bqmfjqexrububqelxwml.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJxbWZqcWV4cnVidWJxZWx4d21sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5MjI2MjcsImV4cCI6MjA3NTQ5ODYyN30.J7lpQZ-q3-vtO68obTxTgcUFkTSCAoYuRKQFK0gQmyU';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJxbWZqcWV4cnVidWJxZWx4d21sIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk5MjI2MjcsImV4cCI6MjA3NTQ5ODYyN30.J7lpQZ-q3-vtO68obTxTgcUFkTSCAoYuRKQFK0gQmyU';
 
 const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -152,26 +152,33 @@ document.addEventListener('DOMContentLoaded', () => {
     const navLinks = document.querySelector('.nav-links');
 
     // --- Attach Event Listeners ---
-// Page Transitions
-// This captures clicks on all internal links
-document.querySelectorAll('a:not([target="_blank"]):not([href^="#"])').forEach(link => {
-    link.addEventListener('click', (e) => {
-        const destination = link.href;
+
+    // Page Transitions -- CORRECTED SCRIPT
+    // This captures clicks on all internal links
+    document.body.addEventListener('click', (e) => {
+        // Check if the clicked element is an anchor tag
+        const link = e.target.closest('a');
         
-        // Prevent transition if the link is not a valid destination or is the current page
-        if (!destination || destination === window.location.href) {
+        // Conditions to IGNORE the transition effect
+        if (!link || // Not a link
+            link.getAttribute('target') === '_blank' || // Opens in new tab
+            link.href.includes('#') || // Is an anchor link
+            !link.href || // Has no href
+            link.href === window.location.href // Links to the current page
+           ) {
             return;
         }
         
         e.preventDefault(); // Stop the browser from instantly changing the page
-        document.body.classList.add('fade-out'); // Add the fade-out class to trigger the CSS animation
+        const destination = link.href;
+        document.body.classList.add('fade-out'); // Add the fade-out class
 
         // Wait for the animation to finish, then change the page
         setTimeout(() => {
             window.location.href = destination;
         }, 400); // This delay MUST match the animation duration in your CSS
     });
-});
+
     // Logout Button
     if (logoutButton) {
         logoutButton.addEventListener('click', async () => {
@@ -270,4 +277,3 @@ document.querySelectorAll('a:not([target="_blank"]):not([href^="#"])').forEach(l
         checkUser();
     }
 });
-
